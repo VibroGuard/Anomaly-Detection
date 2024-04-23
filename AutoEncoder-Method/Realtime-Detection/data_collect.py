@@ -16,6 +16,8 @@ def find_arduino(port=None):
 
 
 def get_serial_port(port=None, baudrate=115200):
+    ser = None
+
     if port is None:
         port = find_arduino()
 
@@ -42,6 +44,8 @@ def fill_buffer(num_samples, ser):
             value = float(ser.readline())
         except:
             value = 0.0
+        print("value: ", value)
+
         temp_buffer.append(value)
         i += 1
 
@@ -56,7 +60,13 @@ def collect_dataset(samples_amount, time_amount, num_samples, ser):
     y_data_buffer = []
     z_data_buffer = []
 
+    x_data_buffer.clear()
+    y_data_buffer.clear()
+    z_data_buffer.clear()
+
     while (time.time() - start_time <= time_amount) and (samples < samples_amount):
+        print(time.time() - start_time)
+
         received_data = str(ser.readline())[2:-5].casefold()
 
         if received_data == "x":
@@ -83,7 +93,7 @@ def collect_dataset(samples_amount, time_amount, num_samples, ser):
             # Increment the samples count.
             samples += num_samples
 
-    return np.array(x_data_buffer), np.array(y_data_buffer), np.array(z_data_buffer)
+    return np.array(x_data_buffer).reshape(-1, 1), np.array(y_data_buffer).reshape(-1, 1), np.array(z_data_buffer).reshape(-1, 1)
 
 
 
