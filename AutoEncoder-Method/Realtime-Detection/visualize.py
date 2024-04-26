@@ -55,3 +55,24 @@ def visualize_data(x, y, z, sps, plot_type, fig, axs):
     fig.canvas.flush_events()
 
     # plt.show()
+
+
+def visualize_data_time_only(x, y, z, sps, fig, axs):
+    names = ["x - axis", "y - axis", "z - axis"]
+
+    for i, ax in enumerate(axs):
+        ax.clear()
+        data = [x, y, z][i]
+        time = len(data) / sps  # time = number of samples / samples per second
+        horizontal_axis = np.linspace(0, time, len(data))
+        ax.plot(horizontal_axis, data)
+
+        ax.set_title(names[i])
+
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel('Magnitude')
+
+    plt.tight_layout()
+
+    plt.pause(0.01)
+    fig.canvas.flush_events()

@@ -37,7 +37,8 @@ if __name__ == "__main__":
     y_data = [0.0] * num_samples
     z_data = [0.0] * num_samples
 
-    fig, axs = plt.subplots(2, 3, figsize=(15, 5))
+    # fig, axs = plt.subplots(2, 3, figsize=(15, 5))
+    fig, axs = plt.subplots(1, 3, figsize=(5, 5))
 
     port = find_arduino()
     ser = get_serial_port(port, 115200)
@@ -63,10 +64,13 @@ if __name__ == "__main__":
             y_data = fill_buffer( num_samples, ser)
         elif received_data == "z":
             z_data = fill_buffer(num_samples, ser)
+        else:
+            continue
 
         # x_data, y_data, z_data = get_new_dataset(ser, num_samples)
         print(x_data)
         print(y_data)
         print(z_data)
 
-        visualize_data(x_data, y_data, z_data, sampling_frequency, "time", fig, axs)
+        # visualize_data(x_data, y_data, z_data, sampling_frequency, "time", fig, axs)
+        visualize_data_time_only(x_data, y_data, z_data, sampling_frequency, fig, axs)
