@@ -67,3 +67,10 @@ def get_max_MAE(model, trainX):
     return max_trainMAE
 
 
+def get_mae(model, xdata):
+    predicted = model.predict(xdata)
+    mae = np.mean(np.abs(predicted - xdata), axis=1)
+
+    return mae
+
+
