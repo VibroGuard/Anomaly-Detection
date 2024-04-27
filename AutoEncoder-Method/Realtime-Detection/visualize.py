@@ -78,10 +78,10 @@ def visualize_data_time_only(x, y, z, sps, fig, axs):
     fig.canvas.flush_events()
 
 
-def visualize_anomalies(x, y, z, x_in, y_in, z_in, fig, axs):
+def visualize_anomalies(x, y, z, x_in, y_in, z_in, sps, fig, axs):
     for i, ax in enumerate(axs):
         data = [np.array(x)[x_in], np.array(y)[y_in], np.array(z)[z_in]][i]
-        indices = [x_in, y_in, z_in][i]
+        indices = [x_in / sps, y_in / sps, z_in / sps][i]
         ax.scatter(indices, data, c="r")
 
     plt.tight_layout()

@@ -105,10 +105,6 @@ if __name__ == "__main__":
                     (
                         trained_models[2][0], trained_models[2][1], trained_models[2][2],
                         np.array(z_data).reshape(-1, 1))))
-
-            # for xxx in anomaly_indices:
-            #     print("Anomalies xxx: ")
-            #     print(xxx)
         else:
             continue
 
@@ -120,4 +116,4 @@ if __name__ == "__main__":
 
         # visualize_data(x_data, y_data, z_data, sampling_frequency, "time", fig, axs)
         visualize_data_time_only(x_data, y_data, z_data, sampling_frequency, fig, axs)
-        visualize_anomalies(x_data, y_data, z_data, anomaly_indices[0], anomaly_indices[1], anomaly_indices[2], fig, axs)
+        visualize_anomalies(x_data, y_data, z_data, anomaly_indices[0], anomaly_indices[1], anomaly_indices[2], sampling_frequency, fig, axs)
