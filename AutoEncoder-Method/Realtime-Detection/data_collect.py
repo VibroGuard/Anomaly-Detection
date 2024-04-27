@@ -44,7 +44,7 @@ def fill_buffer(num_samples, ser):
             value = float(ser.readline())
         except:
             value = 0.0
-        print("value: ", value)
+        # print("value: ", value)
 
         temp_buffer.append(value)
         i += 1
@@ -74,6 +74,7 @@ def collect_dataset(samples_amount, time_amount, num_samples, ser):
 
     while (time.time() - start_time <= time_amount) and (samples < samples_amount):
         print(time.time() - start_time)
+        print(samples)
 
         received_data = str(ser.readline())[2:-5].casefold()
 

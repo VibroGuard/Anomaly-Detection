@@ -1,4 +1,5 @@
 import os
+import time
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
@@ -30,20 +31,25 @@ def model(data_buffer):
     print("Training done.")
 
     return model, max_MAE, scaler
+    # return model, max_MAE, None
 
 
 def predict(model, max_mae, scaler, xdata):
     seq_size = 30
+
     # print("Before scaling: ", xdata.shape)
     xdata = scale(xdata, scaler)
     # print("After scaling: ", xdata.shape)
+    # print("Start splitting to sequences.")
     xdata, ydata = to_sequences(xdata, xdata, seq_size)
+    # print("Done splitting: ")
     # print("Sequenced: ", xdata.shape)
     mae = get_mae(model, xdata)
     # print("MAE acquired.")
     anomaly_indices = np.asarray(mae > max_mae).nonzero()[0]
 
     print("Anomaly indices found.")
+    # print(anomaly_indices)
 
     return anomaly_indices
 
@@ -55,7 +61,7 @@ if __name__ == "__main__":
 
     model_trained = False
     trained_models = None
-    anomaly_indices = None
+    anomaly_indices = []
 
     x_data = [0.0] * num_samples
     y_data = [0.0] * num_samples
@@ -70,7 +76,7 @@ if __name__ == "__main__":
     while True:
         if not model_trained:
             print("Starting collecting data...")
-            x_data_buffer, y_data_buffer, z_data_buffer = collect_dataset(2000, 10, num_samples, ser)
+            x_data_buffer, y_data_buffer, z_data_buffer = collect_dataset(5000, 20, num_samples, ser)
             print("Data collection done.")
             print(x_data_buffer)
             print(y_data_buffer)
@@ -98,13 +104,21 @@ if __name__ == "__main__":
             # Start doing only when data of  all three axis are available.
 
             print("Getting predictions...")
-            with Pool() as pool:
-                anomaly_indices = pool.starmap(predict, (
-                    (trained_models[0][0], trained_models[0][1], trained_models[0][2], np.array(x_data).reshape(-1, 1)),
-                    (trained_models[1][0], trained_models[1][1], trained_models[1][2], np.array(y_data).reshape(-1, 1)),
-                    (
-                        trained_models[2][0], trained_models[2][1], trained_models[2][2],
-                        np.array(z_data).reshape(-1, 1))))
+            # with Pool() as pool:
+            #     anomaly_indices = pool.starmap(predict, (
+            #         (trained_models[0][0], trained_models[0][1], trained_models[0][2], np.array(x_data).reshape(-1, 1)),
+            #         (trained_models[1][0], trained_models[1][1], trained_models[1][2], np.array(y_data).reshape(-1, 1)),
+            #         (
+            #             trained_models[2][0], trained_models[2][1], trained_models[2][2],
+            #             np.array(z_data).reshape(-1, 1))))
+
+            anomaly_indices.clear()
+            anomaly_indices.append(predict(trained_models[0][0], trained_models[0][1], trained_models[0][2],
+                                           np.array(x_data).reshape(-1, 1)))
+            anomaly_indices.append(predict(trained_models[1][0], trained_models[1][1], trained_models[1][2],
+                                           np.array(y_data).reshape(-1, 1)))
+            anomaly_indices.append(predict(trained_models[2][0], trained_models[2][1], trained_models[2][2],
+                                           np.array(z_data).reshape(-1, 1)))
         else:
             continue
 
@@ -112,8 +126,12 @@ if __name__ == "__main__":
         print(y_data)
         print(z_data)
 
-
+        print("Anomaly indices...")
+        print(anomaly_indices[0])
+        print(anomaly_indices[1])
+        print(anomaly_indices[2])
 
         # visualize_data(x_data, y_data, z_data, sampling_frequency, "time", fig, axs)
         visualize_data_time_only(x_data, y_data, z_data, sampling_frequency, fig, axs)
-        visualize_anomalies(x_data, y_data, z_data, anomaly_indices[0], anomaly_indices[1], anomaly_indices[2], sampling_frequency, fig, axs)
+        visualize_anomalies(x_data, y_data, z_data, anomaly_indices[0], anomaly_indices[1], anomaly_indices[2],
+                            sampling_frequency, fig, axs)
