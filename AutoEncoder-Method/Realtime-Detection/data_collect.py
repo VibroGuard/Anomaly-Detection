@@ -10,7 +10,8 @@ def find_arduino(port=None):
     if port is None:
         ports = serial.tools.list_ports.comports()
         for p in ports:
-            if p.manufacturer is not None and "Arduino" in p.manufacturer:
+            print(p.manufacturer)
+            if p.manufacturer is not None and ("Arduino" in p.manufacturer or "FTDI" in p.manufacturer):
                 port = p.device
     return port
 

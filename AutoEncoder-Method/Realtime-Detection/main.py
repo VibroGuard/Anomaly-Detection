@@ -55,7 +55,7 @@ def predict(model, max_mae, scaler, xdata):
 
 
 if __name__ == "__main__":
-    num_samples = 512  # This should match with the number of samples taken by the MCU.
+    num_samples = 256  # This should match with the number of samples taken by the MCU.
     sampling_frequency = 250
     seq_size = 30
 
@@ -71,6 +71,7 @@ if __name__ == "__main__":
     fig, axs = plt.subplots(1, 3, figsize=(5, 5))
 
     port = find_arduino()
+    print(port)
     ser = get_serial_port(port, 115200)
 
     while True:
