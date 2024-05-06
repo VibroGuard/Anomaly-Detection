@@ -1,5 +1,8 @@
 import os
-import time
+from keras.models import load_model
+import joblib
+
+import numpy as np
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
@@ -56,7 +59,7 @@ def predict(model, max_mae, scaler, xdata):
 
 if __name__ == "__main__":
     num_samples = 256  # This should match with the number of samples taken by the MCU.
-    sampling_frequency = 250
+    sampling_frequency = 200
     seq_size = 30
 
     model_trained = False
@@ -77,7 +80,7 @@ if __name__ == "__main__":
     while True:
         if not model_trained:
             print("Starting collecting data...")
-            x_data_buffer, y_data_buffer, z_data_buffer = collect_dataset(5000, 20, num_samples, ser)
+            x_data_buffer, y_data_buffer, z_data_buffer = collect_dataset(5000, 10, num_samples, ser)
             print("Data collection done.")
             print(x_data_buffer)
             print(y_data_buffer)
@@ -88,6 +91,32 @@ if __name__ == "__main__":
                 trained_models = pool.map(model, (x_data_buffer, y_data_buffer, z_data_buffer))
 
             print("Model training done.")
+
+            print("Storing models...")
+            trained_models[0][0].save("x_model.keras")
+            trained_models[1][0].save("y_model.keras")
+            trained_models[2][0].save("z_model.keras")
+
+            print("Storing scalers...")
+            joblib.dump(trained_models[0][2], "x_scaler.save")
+            joblib.dump(trained_models[1][2], "y_scaler.save")
+            joblib.dump(trained_models[2][2], "z_scaler.save")
+
+            print("Storing maximum MAE value...")
+            with open("x_maxMAE.txt", "wt") as x_maxMAE:
+                x_maxMAE.write(str(trained_models[0][1]))
+            with open("y_maxMAE.txt", "wt") as y_maxMAE:
+                y_maxMAE.write(str(trained_models[1][1]))
+            with open("z_maxMAE.txt", "wt") as z_maxMAE:
+                z_maxMAE.write(str(trained_models[2][1]))
+
+            # Retrieving stored values
+            loaded_model = load_model("x_model.keras")
+            loaded_scaler = joblib.load('x_scaler.save')
+            with open("x_maxMAE.txt", "rt") as x_maxMAE:
+                x_maxMAE_value = x_maxMAE.read()
+                print("x_maxMAE: ", x_maxMAE_value)
+
             model_trained = True
 
         received_data = str(ser.readline())[2:-5].casefold()
@@ -104,7 +133,7 @@ if __name__ == "__main__":
 
             # Start doing only when data of  all three axis are available.
 
-            print("Getting predictions...")
+            # print("Getting predictions...")
             # with Pool() as pool:
             #     anomaly_indices = pool.starmap(predict, (
             #         (trained_models[0][0], trained_models[0][1], trained_models[0][2], np.array(x_data).reshape(-1, 1)),
@@ -113,26 +142,26 @@ if __name__ == "__main__":
             #             trained_models[2][0], trained_models[2][1], trained_models[2][2],
             #             np.array(z_data).reshape(-1, 1))))
 
-            anomaly_indices.clear()
-            anomaly_indices.append(predict(trained_models[0][0], trained_models[0][1], trained_models[0][2],
-                                           np.array(x_data).reshape(-1, 1)))
-            anomaly_indices.append(predict(trained_models[1][0], trained_models[1][1], trained_models[1][2],
-                                           np.array(y_data).reshape(-1, 1)))
-            anomaly_indices.append(predict(trained_models[2][0], trained_models[2][1], trained_models[2][2],
-                                           np.array(z_data).reshape(-1, 1)))
+            # anomaly_indices.clear()
+            # anomaly_indices.append(predict(trained_models[0][0], trained_models[0][1], trained_models[0][2],
+            #                                np.array(x_data).reshape(-1, 1)))
+            # anomaly_indices.append(predict(trained_models[1][0], trained_models[1][1], trained_models[1][2],
+            #                                np.array(y_data).reshape(-1, 1)))
+            # anomaly_indices.append(predict(trained_models[2][0], trained_models[2][1], trained_models[2][2],
+            #                                np.array(z_data).reshape(-1, 1)))
         else:
             continue
 
-        print(x_data)
-        print(y_data)
-        print(z_data)
+        # print(x_data)
+        # print(y_data)
+        # print(z_data)
 
-        print("Anomaly indices...")
-        print(anomaly_indices[0])
-        print(anomaly_indices[1])
-        print(anomaly_indices[2])
+        # print("Anomaly indices...")
+        # print(anomaly_indices[0])
+        # print(anomaly_indices[1])
+        # print(anomaly_indices[2])
 
         # visualize_data(x_data, y_data, z_data, sampling_frequency, "time", fig, axs)
-        visualize_data_time_only(x_data, y_data, z_data, sampling_frequency, fig, axs)
-        visualize_anomalies(x_data, y_data, z_data, anomaly_indices[0], anomaly_indices[1], anomaly_indices[2],
-                            sampling_frequency, fig, axs)
+        # visualize_data_time_only(x_data, y_data, z_data, sampling_frequency, fig, axs)
+        # visualize_anomalies(x_data, y_data, z_data, anomaly_indices[0], anomaly_indices[1], anomaly_indices[2],
+        #                     sampling_frequency, fig, axs)

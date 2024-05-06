@@ -73,10 +73,10 @@ def visualize_data_time_only(x, y, z, sps, fig, axs):
         ax.set_xlabel("Time (s)")
         ax.set_ylabel('Magnitude')
 
-    # plt.tight_layout()
+    plt.tight_layout()
 
-    # plt.pause(0.01)
-    # fig.canvas.flush_events()
+    plt.pause(0.01)
+    fig.canvas.flush_events()
 
 
 def visualize_anomalies(x, y, z, x_in, y_in, z_in, sps, fig, axs):

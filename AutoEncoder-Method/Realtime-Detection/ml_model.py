@@ -4,9 +4,7 @@ from keras.layers import LSTM, Input, Dropout
 from keras.layers import Dense
 from keras.layers import RepeatVector
 from keras.layers import TimeDistributed
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from keras.models import Model
+from sklearn.preprocessing import StandardScaler
 
 
 def split_dataset(x_data, split_ratio=0.6):
